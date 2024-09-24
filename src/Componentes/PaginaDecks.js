@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import axios from 'axios';
 import { TextField, Button, Typography, Box, List, ListItem, Divider, Paper } from '@mui/material';
 import { styled } from '@mui/system';
+
 
 const BackgroundContainer = styled("div")({
   display: "flex",
@@ -61,9 +62,16 @@ const StyledTextField = styled(TextField)({
 
 const PaginaDecks = () => {
   const [commanderName, setCommanderName] = useState('');
+  const [landsAmount, setLandsAmount] = useState('');
   const [commanderData, setCommanderData] = useState(null);
   const [deckData, setDeckData] = useState(null);
   const [error, setError] = useState('');
+
+  const setLands = (value) => {
+    let onlyNumber = value.replace(/\D/g, '')
+    setLandsAmount(onlyNumber)
+  }
+
 
   const handleSearch = async () => {
     if (!commanderName) {
@@ -71,28 +79,38 @@ const PaginaDecks = () => {
       return;
     }
 
-    try {
-      const response = await axios.get(`/api/commander/${commanderName}`);
-      if (response.data) {
-        setCommanderData(response.data);
-        setError('');
-        await handleGenerateDeck(response.data);
-      } else {
-        setError('Comandante não encontrado');
-        setCommanderData(null);
-        setDeckData(null);
-      }
-    } catch (err) {
-      setError('Erro ao buscar o comandante');
-      setCommanderData(null);
-      setDeckData(null);
+    if (!landsAmount) {
+      setError('O nome do comandante é obrigatório');
+      return;
     }
+
+    await handleGenerateDeck({ name: commanderName, lands: landsAmount })
+
+
+    // try {
+    //   const response = await axios.get(`/cards/commander${commanderName}`);
+    //   if (response.data) {
+    //     setCommanderData(response.data);
+    //     setError('');
+    //     await handleGenerateDeck(response.data);
+    //   } else {
+    //     setError('Comandante não encontrado');
+    //     setCommanderData(null);
+    //     setDeckData(null);
+    //   }
+    // } catch (err) {
+    //   setError('Erro ao buscar o comandante');
+    //   setCommanderData(null);
+    //   setDeckData(null);
+    // }
   };
 
   const handleGenerateDeck = async (commander) => {
     try {
-      const deckResponse = await axios.post(`/api/deck/generate`, {
+      // setar o token na requisição
+      const deckResponse = await axios.post(`http://localhost:3000/cards/commander`, {
         commanderName: commander.name,
+        landsAmount: commander.lands
       });
       if (deckResponse.data) {
         setDeckData(deckResponse.data);
@@ -116,6 +134,15 @@ const PaginaDecks = () => {
           variant="outlined"
           value={commanderName}
           onChange={(e) => setCommanderName(e.target.value)}
+          error={!!error}
+          helperText={error}
+          fullWidth
+        />
+        <StyledTextField
+          label="Quantidade de terrenos"
+          variant="outlined"
+          value={landsAmount}
+          onChange={(e) => setLands(e.target.value)}
           error={!!error}
           helperText={error}
           fullWidth

@@ -13,7 +13,11 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import axios from 'axios';
+import axios from "axios";
+
+const api = axios.create({
+    baseURL: 'http://localhost:3000/',
+});
 
 const BackgroundContainer = styled("div")({
     display: "flex",
@@ -136,14 +140,14 @@ const PaginaLogin = () => {
             }
 
             try {
-                const response = await axios.post('/api/auth/register', {
+                const response = await api.post('users/create', {
                     name: username,
-                    email,
-                    password,
+                    email: email,
+                    password: password,
                 });
 
                 setIsLoading(false);
-                navigate('/dashboard'); 
+                navigate('/decks');
             } catch (error) {
                 setErrorMessage('Erro ao registrar. Tente novamente.');
                 setIsLoading(false);
@@ -162,10 +166,10 @@ const PaginaLogin = () => {
             }
 
             try {
-                const response = await axios.post('/api/auth/login', {
-                    email,
-                    password,
-                });
+                // const loginDto = { email: email, password: password }
+                // const loginJson = JSON.stringify(loginDto)
+
+                const response = await api.post('auth/login', { email: email, password: password });
 
                 const { token } = response.data;
                 localStorage.setItem('token', token);
