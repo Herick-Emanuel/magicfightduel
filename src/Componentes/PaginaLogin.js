@@ -145,7 +145,7 @@ function PaginaLogin() {
         });
 
         setIsLoading(false);
-        navigate('/decks');
+        setIsRegistering(false)
       } catch (error) {
         setErrorMessage('Erro ao registrar. Tente novamente.');
         setIsLoading(false);
@@ -164,9 +164,8 @@ function PaginaLogin() {
 
       try {
         const response = await api.post('auth/login', { email, password });
-        console.log(response.data);
-        const { accessToken } = response.data;
-        localStorage.setItem('token', accessToken);
+        const { access_token } = response.data;
+        localStorage.setItem('token', access_token);
         setIsLoading(false);
         navigate('/decks');
       } catch (error) {

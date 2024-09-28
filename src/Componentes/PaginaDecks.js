@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   TextField, Button, Typography, Box, Dialog, DialogTitle, DialogContent, List, ListItem, Divider,
 } from '@mui/material';
-import { styled } from '@mui/system';
+import { display, styled } from '@mui/system';
 
 const BackgroundContainer = styled('div')({
   display: 'flex',
@@ -32,13 +32,28 @@ const StyledButton = styled(Button)({
   width: '100px',
   color: '#fff',
   fontWeight: 'bold',
-  padding: '10px 0',
+  padding: '10px 10px',
   borderRadius: '25px',
   marginTop: '20px',
   '&:hover': {
     background: '#EBB467',
   },
 });
+
+const CenterBox = styled('div')({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  flexDirection: 'column',
+  textWrap: 'nowrap'
+})
+
+const DivError = styled('div')({
+  display: 'flex',
+  justifyContent: 'center',
+  color: 'red',
+  padding: '10px 0'
+})
 
 const StyledTextField = styled(TextField)({
   marginBottom: '20px',
@@ -117,18 +132,21 @@ function CommanderSearch({ onCommanderFound, landsAmount, setLandsAmount }) {
 }
 
 function GenerateDeck({ commander, landsAmount, onDeckGenerated }) {
-  const [setError] = useState('');
+  const [error, setError] = useState('');
 
   const handleGenerate = async () => {
     try {
       const token = localStorage.getItem('token');
+
       const deckResponse = await axios.post('http://localhost:3001/cards/commander', {
         commanderName: commander.name,
         landsAmount: parseInt(landsAmount, 10),
       }, { headers: { Authorization: `Bearer ${token}` } });
+
+
       if (deckResponse.data) {
         setError('');
-        onDeckGenerated(deckResponse.data);
+        onDeckGenerated(deckResponse.data.data);
       } else {
         setError('Erro ao gerar o deck');
       }
@@ -138,25 +156,35 @@ function GenerateDeck({ commander, landsAmount, onDeckGenerated }) {
   };
   return (
     <Box>
-      <StyledButton variant="contained" onClick={handleGenerate}>
-        Gerar Deck
-      </StyledButton>
+      <CenterBox>
+        <StyledButton variant="contained" onClick={handleGenerate}>
+          Gerar Deck
+        </StyledButton>
+
+        <DivError>
+          {error}
+        </DivError>
+      </CenterBox>
     </Box>
   );
 }
 
-function DeckDetailsDialog({ open, onClose, deck }) {
+function DeckDetailsDialog({ open, setOpen, onClose, deck }) {
+
+  useEffect(() => {
+    setOpen(true)
+    console.log(deck)
+  }, [])
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Detalhes do Deck</DialogTitle>
       <DialogContent>
         <Typography variant="h6">
-          Comandante:
-          {deck.commander.name}
+          Comandante:  {deck.commander}
         </Typography>
         <Typography variant="subtitle1">
-          Quantidade de Terrenos:
-          {deck.landsAmount}
+          Quantidade de Terrenos:  {deck.lands}
         </Typography>
         <List>
           {deck.cards.map((card) => (
@@ -167,7 +195,11 @@ function DeckDetailsDialog({ open, onClose, deck }) {
                     <strong>{card.name}</strong>
                     {' '}
                     -
+                    {' '}
                     {card.type_line}
+                    {' '}
+                    <br />
+                    <br />
                   </Typography>
                   <Typography variant="body2">{card.oracle_text}</Typography>
                 </Box>
@@ -200,7 +232,7 @@ function PaginaDecks() {
             setLandsAmount={setLandsAmount}
           />
         )}
-        {commanderData && !deckData && (
+        {commanderData !== null && deckData == null && (
           <GenerateDeck
             commander={commanderData.commander}
             landsAmount={landsAmount}
@@ -209,8 +241,13 @@ function PaginaDecks() {
         )}
       </FormContainer>
 
-      {deckData && (
-        <DeckDetailsDialog open={openDialog} onClose={() => setOpenDialog(false)} deck={deckData} />
+      {deckData !== null && (
+        <DeckDetailsDialog open={openDialog} setOpen={setOpenDialog} onClose={() => {
+          setOpenDialog(false)
+          setCommanderData(null)
+          setDeckData(null)
+          setLandsAmount('')
+        }} deck={deckData} />
       )}
     </BackgroundContainer>
   );
