@@ -16,7 +16,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000/',
+    baseURL: 'http://localhost:3001/',
 });
 
 const BackgroundContainer = styled("div")({
@@ -170,11 +170,11 @@ const PaginaLogin = () => {
                 // const loginJson = JSON.stringify(loginDto)
 
                 const response = await api.post('auth/login', { email: email, password: password });
-
-                const { token } = response.data;
-                localStorage.setItem('token', token);
+                console.log(response.data)
+                const { access_token } = response.data;
+                localStorage.setItem('token', access_token);
                 setIsLoading(false);
-                navigate('/dashboard');
+                navigate('/decks');
             } catch (error) {
                 setErrorMessage('Email ou senha incorretos.');
                 setIsLoading(false);

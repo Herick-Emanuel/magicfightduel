@@ -119,10 +119,11 @@ const GenerateDeck = ({ commander, landsAmount, onDeckGenerated }) => {
 
   const handleGenerate = async () => {
     try {
-      const deckResponse = await axios.post('http://localhost:3000/cards/commander', {
+      const token = localStorage.getItem("token")
+      const deckResponse = await axios.post('http://localhost:3001/cards/commander', {
         commanderName: commander.name,
         landsAmount: parseInt(landsAmount),
-      });
+      }, { headers: { Authorization: 'Bearer ' + token } });
       if (deckResponse.data) {
         setError('');
         onDeckGenerated(deckResponse.data);
