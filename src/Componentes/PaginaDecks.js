@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Box, List, ListItem, Divider, Paper } from '@mui/material';
+import { TextField, Button, Typography, Box, Card, CardContent, CardMedia, Dialog, DialogTitle, DialogContent, List, ListItem, Divider } from '@mui/material';
 import { styled } from '@mui/system';
 
 const BackgroundContainer = styled("div")({
@@ -9,6 +9,7 @@ const BackgroundContainer = styled("div")({
   alignItems: "center",
   height: "100vh",
   background: "#F0E069",
+  flexDirection: 'column'
 });
 
 const FormContainer = styled("div")({
@@ -59,7 +60,7 @@ const StyledTextField = styled(TextField)({
   },
 });
 
-const CommanderSearch = ({ onCommanderFound }) => {
+const CommanderSearch = ({ onCommanderFound, landsAmount, setLandsAmount }) => {
   const [commanderName, setCommanderName] = useState('');
   const [error, setError] = useState('');
 
@@ -68,11 +69,16 @@ const CommanderSearch = ({ onCommanderFound }) => {
       setError('O nome do comandante é obrigatório');
       return;
     }
+    if (!landsAmount) {
+      setError('A quantidade de terrenos é obrigatória');
+      return;
+    }
+
     try {
       const response = await axios.get(`https://api.scryfall.com/cards/named?fuzzy=${commanderName}`);
       if (response.data) {
         setError('');
-        onCommanderFound(response.data);
+        onCommanderFound({ commander: response.data, landsAmount });
       } else {
         setError('Comandante não encontrado');
       }
@@ -92,6 +98,15 @@ const CommanderSearch = ({ onCommanderFound }) => {
         helperText={error}
         fullWidth
       />
+      <StyledTextField
+        label="Quantidade de Terrenos"
+        variant="outlined"
+        value={landsAmount}
+        onChange={(e) => setLandsAmount(e.target.value)}
+        error={!!error && !landsAmount}
+        helperText={!!error && !landsAmount ? error : ''}
+        fullWidth
+      />
       <StyledButton variant="contained" onClick={handleSearch}>
         Buscar
       </StyledButton>
@@ -99,24 +114,14 @@ const CommanderSearch = ({ onCommanderFound }) => {
   );
 };
 
-const GenerateDeck = ({ commander, onDeckGenerated }) => {
-  const [landsAmount, setLandsAmount] = useState('');
+const GenerateDeck = ({ commander, landsAmount, onDeckGenerated }) => {
   const [error, setError] = useState('');
 
-  const setLands = (value) => {
-    const onlyNumber = value.replace(/\D/g, '');
-    setLandsAmount(onlyNumber);
-  };
-
   const handleGenerate = async () => {
-    if (!landsAmount) {
-      setError('A quantidade de terrenos é obrigatória');
-      return;
-    }
     try {
       const deckResponse = await axios.post('http://localhost:3000/cards/commander', {
         commanderName: commander.name,
-        landsAmount,
+        landsAmount: parseInt(landsAmount),
       });
       if (deckResponse.data) {
         setError('');
@@ -131,15 +136,6 @@ const GenerateDeck = ({ commander, onDeckGenerated }) => {
 
   return (
     <Box>
-      <StyledTextField
-        label="Quantidade de Terrenos"
-        variant="outlined"
-        value={landsAmount}
-        onChange={(e) => setLands(e.target.value)}
-        error={!!error}
-        helperText={error}
-        fullWidth
-      />
       <StyledButton variant="contained" onClick={handleGenerate}>
         Gerar Deck
       </StyledButton>
@@ -147,46 +143,36 @@ const GenerateDeck = ({ commander, onDeckGenerated }) => {
   );
 };
 
-const CommanderDetails = ({ commander }) => (
-  <Box mt={4} width="100%">
-    <Typography variant="h6">Detalhes do Comandante:</Typography>
-    <Typography>Nome: {commander.name}</Typography>
-    <Typography>Tipo: {commander.type_line}</Typography>
-    <Typography>Descrição: {commander.oracle_text}</Typography>
-  </Box>
-);
-
-const DeckDisplay = ({ deck }) => (
-  <Box mt={4} width="100%">
-    <Typography variant="h6">Deck Gerado:</Typography>
-    <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
-      <Typography variant="subtitle1">JSON do Deck:</Typography>
-      <pre style={{ background: '#f4f4f4', padding: '10px', borderRadius: '4px' }}>
-        {JSON.stringify(deck, null, 2)}
-      </pre>
-    </Paper>
-    <Typography variant="subtitle1">Cartas no Deck:</Typography>
-    <List>
-      {deck.cards.map((card, index) => (
-        <React.Fragment key={index}>
-          <ListItem>
-            <Box>
-              <Typography variant="body1">
-                <strong>{card.name}</strong> - {card.type_line}
-              </Typography>
-              <Typography variant="body2">{card.oracle_text}</Typography>
-            </Box>
-          </ListItem>
-          {index < deck.cards.length - 1 && <Divider />}
-        </React.Fragment>
-      ))}
-    </List>
-  </Box>
+const DeckDetailsDialog = ({ open, onClose, deck }) => (
+  <Dialog open={open} onClose={onClose} fullWidth>
+    <DialogTitle>Detalhes do Deck</DialogTitle>
+    <DialogContent>
+      <Typography variant="h6">Comandante: {deck.commander.name}</Typography>
+      <Typography variant="subtitle1">Quantidade de Terrenos: {deck.landsAmount}</Typography>
+      <List>
+        {deck.cards.map((card, index) => (
+          <React.Fragment key={index}>
+            <ListItem>
+              <Box>
+                <Typography variant="body1">
+                  <strong>{card.name}</strong> - {card.type_line}
+                </Typography>
+                <Typography variant="body2">{card.oracle_text}</Typography>
+              </Box>
+            </ListItem>
+            {index < deck.cards.length - 1 && <Divider />}
+          </React.Fragment>
+        ))}
+      </List>
+    </DialogContent>
+  </Dialog>
 );
 
 const PaginaDecks = () => {
   const [commanderData, setCommanderData] = useState(null);
   const [deckData, setDeckData] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [landsAmount, setLandsAmount] = useState('');
 
   return (
     <BackgroundContainer>
@@ -194,15 +180,25 @@ const PaginaDecks = () => {
         <Typography component="h1" variant="h5" gutterBottom>
           Buscar Comandante de Magic
         </Typography>
-        {!commanderData && <CommanderSearch onCommanderFound={setCommanderData} />}
-        {commanderData && !deckData && (
-          <>
-            <CommanderDetails commander={commanderData} />
-            <GenerateDeck commander={commanderData} onDeckGenerated={setDeckData} />
-          </>
+        {!commanderData && (
+          <CommanderSearch
+            onCommanderFound={setCommanderData}
+            landsAmount={landsAmount}
+            setLandsAmount={setLandsAmount}
+          />
         )}
-        {deckData && <DeckDisplay deck={deckData} />}
+        {commanderData && !deckData && (
+          <GenerateDeck
+            commander={commanderData.commander}
+            landsAmount={landsAmount}
+            onDeckGenerated={setDeckData}
+          />
+        )}
       </FormContainer>
+
+      {deckData && (
+        <DeckDetailsDialog open={openDialog} onClose={() => setOpenDialog(false)} deck={deckData} />
+      )}
     </BackgroundContainer>
   );
 };
