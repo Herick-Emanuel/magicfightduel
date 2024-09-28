@@ -166,8 +166,6 @@ const PaginaLogin = () => {
             }
 
             try {
-                // const loginDto = { email: email, password: password }
-                // const loginJson = JSON.stringify(loginDto)
 
                 const response = await api.post('auth/login', { email: email, password: password });
 
