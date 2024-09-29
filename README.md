@@ -1,70 +1,131 @@
-# Getting Started with Create React App
+Magic Commander Deck Builder
+Bem-vindo ao Magic Commander Deck Builder! Este projeto é uma aplicação web desenvolvida com React que permite aos usuários buscar comandantes de Magic: The Gathering, gerar decks personalizados e visualizar detalhes completos dos decks criados. Além disso, inclui funcionalidades de autenticação para registro e login de usuários.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+📋 Índice
+Visão Geral
+Tecnologias Utilizadas
+Pré-requisitos
+Instalação
+1. Clone o Repositório
+2. Instale as Dependências
+3. Configure as Variáveis de Ambiente
+Execução do Projeto
+1. Inicie o Backend
+2. Inicie o Frontend
+Configuração do ESLint
+Scripts Disponíveis
+Contribuição
+Licença
+Visão Geral
+O Magic Commander Deck Builder permite que jogadores de Magic: The Gathering busquem comandantes usando a API da Scryfall, especifiquem a quantidade de terrenos desejados e gerem decks personalizados. A aplicação também inclui funcionalidades de registro e login para que os usuários possam salvar e gerenciar seus decks.
 
-## Available Scripts
+Tecnologias Utilizadas
+Frontend:
 
-In the project directory, you can run:
+React
+Material-UI (MUI)
+Axios
+React Router DOM
+Styled Components
+ESLint com configuração Airbnb
+Backend:
 
-### `npm start`
+Node.js
+Express.js
+JWT para autenticação
+Axios (para chamadas a APIs externas)
+Pré-requisitos
+Antes de começar, certifique-se de ter o seguinte instalado em sua máquina:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Node.js (v14 ou superior)
+npm ou Yarn
+Instalação
+1. Clone o Repositório
+Abra seu terminal e execute o seguinte comando para clonar o repositório:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+git clone https://github.com/seu-usuario/magic-commander-deck-builder.git
+Entre na pasta do projeto:
 
-### `npm test`
+cd magic-commander-deck-builder
+2. Instale as Dependências
+Backend
+Navegue até a pasta do backend e instale as dependências:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+cd backend
+npm install
+Frontend
+Em outra janela de terminal, navegue até a pasta do frontend e instale as dependências:
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+REACT_APP_API_URL=http://localhost:3001/
+REACT_APP_API_URL: URL base para as requisições da API.
+Execução do Projeto
+1. Inicie o Backend
+Na pasta backend, execute:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+npm start
+O backend será iniciado na porta especificada no arquivo .env (por padrão, http://localhost:3001).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Inicie o Frontend
+Na pasta frontend, execute:
 
-### `npm run eject`
+npm start
+O frontend será iniciado na porta http://localhost:3000 e se comunicará com o backend.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Configuração do ESLint
+O projeto utiliza o ESLint com a configuração Airbnb para manter a qualidade e consistência do código. Para garantir que o ESLint funcione corretamente, siga os passos abaixo:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Instale as Dependências do ESLint:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Já devem estar instaladas através do npm install na etapa de instalação.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Executar o ESLint:
 
-## Learn More
+Para verificar o código, execute:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+npx eslint .
+Para corrigir automaticamente alguns problemas, execute:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+npx eslint . --fix
+Scripts Disponíveis
+Backend
+Iniciar o servidor:
 
-### Code Splitting
+npm start
+Desenvolvimento com nodemon:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+npm run dev
+Executar testes:
 
-### Analyzing the Bundle Size
+npm test
+Frontend
+Iniciar a aplicação:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+npm start
+Construir para produção:
 
-### Making a Progressive Web App
+npm run build
+Executar testes:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+npm test
+Contribuição
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests para melhorias ou correções.
 
-### Advanced Configuration
+Fork o Repositório
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Crie uma Branch para sua Feature:
 
-### Deployment
+git checkout -b minha-nova-feature
+Commit suas Mudanças:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` fails to minify
+git commit -m 'Adiciona nova feature'
+Push para a Branch:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+git push origin minha-nova-feature
+Abra um Pull Request
+
+Licença
+Este projeto está licenciado sob a licença MIT.
+
