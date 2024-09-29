@@ -95,21 +95,9 @@ npm start
 Desenvolvimento com nodemon:
 
 npm run dev
-Executar testes:
-
-npm test
-Frontend
-Iniciar a aplicação:
 
 npm start
 Construir para produção:
-
-npm run build
-Executar testes:
-
-npm test
-Contribuição
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests para melhorias ou correções.
 
 Fork o Repositório
 
